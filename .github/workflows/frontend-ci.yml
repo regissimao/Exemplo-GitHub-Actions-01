@@ -1,0 +1,50 @@
+name: Frontend Tests (Jasmine + Playwright)
+
+on:
+  push:
+    paths:
+      - 'calc-frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    paths:
+      - 'calc-frontend/**'
+
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar Playwright
+        run: |
+          npm init -y
+          npm install @playwright/test --save-dev
+          npx playwright install --with-deps
+
+      - name: Executar testes do frontend
+        run: |
+          cat > test-frontend.spec.js << 'EOF'
+          import { test, expect } from "@playwright/test";
+
+          test("Jasmine frontend test runner", async ({ page }) => {
+            await page.goto("file://" + process.cwd() + "/calc-frontend/tests/SpecRunner.html");
+
+            // Espera Jasmine finalizar (barra de sucesso ou falha)
+            await page.waitForSelector(".jasmine-bar.jasmine-success, .jasmine-bar.jasmine-failed");
+
+            const failed = await page.locator(".jasmine-failed").count();
+            if (failed > 0) {
+              const logs = await page.locator(".jasmine-summary .jasmine-failed").textContent();
+              throw new Error("Testes falharam:\n" + logs);
+            }
+          });
+          EOF
+
+          npx playwright test test-frontend.spec.js
