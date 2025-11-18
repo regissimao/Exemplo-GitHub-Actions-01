@@ -39,10 +39,13 @@ jobs:
             // Espera Jasmine finalizar (barra de sucesso ou falha)
             await page.waitForSelector(".jasmine-bar.jasmine-success, .jasmine-bar.jasmine-failed");
 
-            const failed = await page.locator(".jasmine-failed").count();
-            if (failed > 0) {
-              const logs = await page.locator(".jasmine-summary .jasmine-failed").textContent();
-              throw new Error("Testes falharam:\n" + logs);
+            const failedItems = page.locator(".jasmine-summary .jasmine-failed");
+            const failedCount = await failedItems.count();
+
+            if (failedCount > 0) {
+              const textos = await failedItems.allTextContents();
+              const mensagem = textos.join("\n----------------\n");
+              throw new Error("Testes do Jasmine falharam:\n" + mensagem);
             }
           });
           EOF
