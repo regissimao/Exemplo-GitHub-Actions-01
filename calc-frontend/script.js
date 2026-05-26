@@ -1,4 +1,4 @@
-(function(){
+(function(){ 
   const form = document.getElementById('calc-form');
   const inputA = document.getElementById('a');
   const inputB = document.getElementById('b');
