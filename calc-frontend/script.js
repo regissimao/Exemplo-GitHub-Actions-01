@@ -1,5 +1,5 @@
 (function(){ 
-  const form = document.getElementById('calc-form');
+  const form = document.getElementById('calc-form'); 
   const inputA = document.getElementById('a');
   const inputB = document.getElementById('b');
   const selectOp = document.getElementById('op');
